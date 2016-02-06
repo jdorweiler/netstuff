@@ -91,8 +91,6 @@ char *receive(int new_fd){
     static char msg[500];
     msg[ recv(new_fd, msg, 500, 0) ] = '\0';
 
-    cout << std::hex << msg << endl;
-
     if( strncmp(msg, "\\quit", 5) == 0 ){
         quit = 1;
     }
