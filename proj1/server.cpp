@@ -18,13 +18,14 @@
 using namespace std;
 int quit = 0;
 
-void sigchld_handler(int s){
-    // waitpid() might overwrite errno, so we save and restore it:
-    int saved_errno = errno;
+void handler(int s){
+    if(s == SIGPIPE){
+        quit = 1;
+    }
+    else {
 
-    while(waitpid(-1, NULL, WNOHANG) > 0);
-
-    errno = saved_errno;
+        exit(s);
+    }
 }
 
 int setup(int sockfd, struct addrinfo *p, struct sigaction sa, struct addrinfo *servinfo, int yes) {
@@ -133,6 +134,8 @@ int main(int argc, char **argv){
     int rv;
     int size = 500;
     char message_buffer[size];
+
+    signal(SIGPIPE, handler);
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC; // get all types back
