@@ -1,3 +1,4 @@
+// These sources were helpful:
 // http://beej.us/guide/bgnet/output/html/multipage/syscalls.html#socket
 // https://www.youtube.com/watch?v=IydkqseK6oQ
 #include <stdio.h>
@@ -108,19 +109,6 @@ void *get_in_addr(struct sockaddr *sa){
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-bool connected(int new_fd)
-{
-     char buf;
-     int err = recv(new_fd, &buf, 0, MSG_PEEK);
-     if(err == ENOTCONN){
-        printf("socket closed\n");
-        close(new_fd);
-        quit = 1;
-        return false;
-     }
-     return true;
-}
-
 int main(int argc, char **argv){
     int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
     struct addrinfo hints, *servinfo, *p;
@@ -165,7 +153,7 @@ int main(int argc, char **argv){
 
     while(1){
 
-        while(new_fd > 0) {  // main accept() loop
+        while(new_fd > 0) {
 
             while(!quit){
 
@@ -194,9 +182,6 @@ int main(int argc, char **argv){
                 receive(new_fd);
             }
         }
-
-    //close(sockfd);
     }
-
-    //return 0;
+    return 0;
 }

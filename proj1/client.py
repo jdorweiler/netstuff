@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# used this source to figure out how to read stdin
 # http://stackoverflow.com/questions/323829/how-to-find-out-if-there-is-data-to-be-read-from-stdin-on-windows-in-python
 
 import sys
@@ -8,9 +9,8 @@ import select
 import os
 import signal
 
-serverName = '127.0.0.1'
-MSGLEN = 100
-serverPort = int(sys.argv[1]);
+serverName = sys.argv[1];
+serverPort = int(sys.argv[2]);
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
