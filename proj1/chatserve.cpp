@@ -1,6 +1,10 @@
-// These sources were helpful:
-// http://beej.us/guide/bgnet/output/html/multipage/syscalls.html#socket
-// https://www.youtube.com/watch?v=IydkqseK6oQ
+// Jason Dorweiler
+// CS372 Project 1,  chatserver
+// 
+// Desc:  Start a chat server that listens on a specified <port>
+// Compile: g++ chatserve.cpp -o chatserve
+// Usage: ./chatserve <port #>
+//
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -29,6 +33,8 @@ void handler(int s){
     }
 }
 
+// Initial setup stuff.  This is pretty much right out of beej.us but I broken it into 
+// its own function for modularity.  Returns a file descriptor for the socket
 int setup(int sockfd, struct addrinfo *p, struct sigaction sa, struct addrinfo *servinfo, int yes) {
 
     // loop through all the results and bind to the first we can
@@ -71,6 +77,8 @@ int setup(int sockfd, struct addrinfo *p, struct sigaction sa, struct addrinfo *
     return sockfd;
 }
 
+// Sent a message to the client.  We check for the "\quit" message and
+// set the quit flag if seen
 void sendmsg(int new_fd){
     char buffer[500];
     int length;
@@ -88,6 +96,7 @@ void sendmsg(int new_fd){
     }
 }
 
+// receive the message and print to stdout
 char *receive(int new_fd){
     static char msg[500];
     msg[ recv(new_fd, msg, 500, 0) ] = '\0';
@@ -110,9 +119,9 @@ void *get_in_addr(struct sockaddr *sa){
 }
 
 int main(int argc, char **argv){
-    int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
+    int sockfd, new_fd;  
     struct addrinfo hints, *servinfo, *p;
-    struct sockaddr_storage their_addr; // connector's address information
+    struct sockaddr_storage their_addr; 
     socklen_t sin_size;
     struct sigaction sa;
     int yes=1;
@@ -128,6 +137,8 @@ int main(int argc, char **argv){
     hints.ai_socktype = SOCK_STREAM; // type SOCK_STREAM, SOCK_DGRAM
     hints.ai_flags = AI_PASSIVE; // use my IP
 
+    // check that we got a port number.  This is a pretty dumb check that there
+    // is something in argv
     if (argc < 2){
         std::cerr << "Usage: " << argv[0] << "<port number>" << std::endl;
         return 1;
@@ -142,7 +153,8 @@ int main(int argc, char **argv){
 
     printf("server: waiting for connections on %s...\n", argv[1]);
     printf("sockfd: %d\n", sockfd);
-    
+
+    // Receive the initial connection and prompt the client for the username
     sin_size = sizeof their_addr;
     new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
     inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);       
@@ -154,6 +166,9 @@ int main(int argc, char **argv){
     while(1){
 
         while(new_fd > 0) {
+
+            // If we have an open socket keep alternating between sending and 
+            // receiving messages
 
             while(!quit){
 
@@ -167,10 +182,12 @@ int main(int argc, char **argv){
                 }
             }
 
+            // got the quit flag, close the socket
             close(new_fd);
 
             new_fd = 0;
 
+            // Check for new connections.  Same as above.
             if(new_fd == 0){
                 cout << "CONNECTION CLOSED \n" << endl;
                 quit = 0;
