@@ -9,11 +9,10 @@ import os
 import signal
 import time
 
-serverName = '127.0.0.1'
 MSGLEN = 100
 
 if(len(sys.argv) < 4):
-    print "Usage: ./client.py <server_host> <server_port> <command> <filename>"
+    print "Usage: ./client.py <server_host> <server_port> <filename> <"
     sys.exit(0)
 
 def handler(signum, frame):
@@ -29,8 +28,10 @@ def receive(client):
 	except: pass
 	return msg[: len(msg)-1]
 
+
+serverName = sys.argv[1]
 # set up host connection
-serverPort = int(sys.argv[1]);
+serverPort = int(sys.argv[2]);
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
@@ -38,33 +39,31 @@ clientSocket.connect((serverName, serverPort))
 signal.signal(signal.SIGINT, handler)
 
 # send message to server
-init_msg = "\n".join(sys.argv);
-send(clientSocket, init_msg)
+if(len(sys.argv) == 5):
+    msg = "\n".join([sys.argv[1], sys.argv[2], sys.argv[4], sys.argv[3]])
+    send(clientSocket,msg)
 
+if(len(sys.argv) == 6):
+    msg = "\n".join([sys.argv[1], sys.argv[2], sys.argv[5], sys.argv[3], sys.argv[4]])
+    send(clientSocket,msg)
 
-#message = receive(clientSocket)
-#if message:
-#	message = message.rstrip()
-#	print "server > " + message
-
-
-print "Data connection on " + sys.argv[2]
-print "Control connection on " + sys.argv[1]
-
-time.sleep(2)
-
-dataSocket = socket(AF_INET, SOCK_STREAM)
-dataSocket.connect((serverName, int(sys.argv[2])) )
+time.sleep(1)
 
 cmd_opt = sys.argv[3]
+dataSocket = socket(AF_INET, SOCK_STREAM)
 
 if(cmd_opt == '-l'):
+    print "Connecting data line to " + sys.argv[4]
+    dataSocket.connect((serverName, int(sys.argv[4])) )
+    
     while 1:
         msg = clientSocket.recv(500)
         if not msg:
             break
         print msg
 else:
+    dataSocket.connect((serverName, int(sys.argv[5])) )
+    
     msg2 = clientSocket.recv(500)
     
     if msg2:
