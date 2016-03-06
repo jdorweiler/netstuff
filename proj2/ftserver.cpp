@@ -1,6 +1,9 @@
-// http://beej.us/guide/bgnet/output/html/multipage/syscalls.html#socket
-// https://www.youtube.com/watch?v=IydkqseK6oQ
-// compile with g++ -std=c++0x server.cpp
+// Jason Dorweiler
+// CS372 project 1, ftserver
+//
+// Desc: start an ftp server on a given port
+// compile: make
+// usage ./ftserver <port number>
 //
 #include <stdio.h>
 #include <stdlib.h>

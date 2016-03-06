@@ -1,6 +1,11 @@
 #!/usr/bin/env python
-# http://stackoverflow.com/questions/323829/how-to-find-out-if-there-is-data-to-be-read-from-stdin-on-windows-in-python
-
+# Jason Dorweiler
+# cs372 Project 1
+#
+# Usage: ./ftclient <host> <control port> <option> <file name> <data port>
+# Options:  -l (get list of files)
+#           -g (get a file)
+#
 import sys
 import re
 from socket import *
@@ -53,7 +58,6 @@ cmd_opt = sys.argv[3]
 dataSocket = socket(AF_INET, SOCK_STREAM)
 
 if(cmd_opt == '-l'):
-    print "Connecting data line to " + sys.argv[4]
     dataSocket.connect((serverName, int(sys.argv[4])) )
     
     while 1:
@@ -63,7 +67,6 @@ if(cmd_opt == '-l'):
         print msg
 else:
     dataSocket.connect((serverName, int(sys.argv[5])) )
-    
     msg2 = clientSocket.recv(500)
     
     if msg2:
